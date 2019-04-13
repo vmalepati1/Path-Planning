@@ -1,6 +1,5 @@
 package org.waltonrobotics.field;
 
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.waltonrobotics.geometry.ConvexHull;
 import org.waltonrobotics.geometry.Vector2f;
 import org.waltonrobotics.geometry.Vector2i;
@@ -54,14 +53,14 @@ public class FieldGenerator {
      *                                   area needs to be for it to be considered a border
      * @param fieldWidthActualUnits:     The width of the actual field in real-world units (ex. meters)
      * @param fieldHeightActualUnits:    The height of the actual field in real-world units (ex. meters)
-     * @throws InvalidArgumentException: User-provided arguments are invalid
+     * @throws IllegalArgumentException: User-provided arguments are invalid
      * @throws IOException:              Unable to open image file from given path
      */
     public FieldGenerator(String path,
                           Color freeSpaceColor,
                           int freeSpaceChannelTolerance, int blobColorChannelTolerance,
                           double borderDetectionFactor,
-                          double fieldWidthActualUnits, double fieldHeightActualUnits) throws InvalidArgumentException, IOException {
+                          double fieldWidthActualUnits, double fieldHeightActualUnits) throws IllegalArgumentException, IOException {
         this.fieldDrawingPath = path;
         this.freeSpaceColor = freeSpaceColor;
         this.freeSpaceChannelTolerance = freeSpaceChannelTolerance;
@@ -91,7 +90,7 @@ public class FieldGenerator {
      * @param fieldHeightPixels          The height of the field in pixels from the translated origin
      * @param fieldWidthActualUnits:     The width of the actual field in real-world units (ex. meters)
      * @param fieldHeightActualUnits:    The height of the actual field in real-world units (ex. meters)
-     * @throws InvalidArgumentException: User-provided arguments are invalid
+     * @throws IllegalArgumentException: User-provided arguments are invalid
      * @throws IOException:              Unable to open image file from given path
      */
     public FieldGenerator(String path,
@@ -100,7 +99,7 @@ public class FieldGenerator {
                           double borderDetectionFactor,
                           Vector2i translatedOrigin,
                           int fieldWidthPixels, int fieldHeightPixels,
-                          double fieldWidthActualUnits, double fieldHeightActualUnits) throws InvalidArgumentException, IOException {
+                          double fieldWidthActualUnits, double fieldHeightActualUnits) throws IllegalArgumentException, IOException {
         this.fieldDrawingPath = path;
         this.freeSpaceColor = freeSpaceColor;
         this.freeSpaceChannelTolerance = freeSpaceChannelTolerance;
@@ -126,7 +125,7 @@ public class FieldGenerator {
                     new Vector2i(131, 143),
                     1584, 642,
                     22.54, 9.14);
-        } catch (InvalidArgumentException | IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
         }
 
@@ -178,29 +177,29 @@ public class FieldGenerator {
     /**
      * Loads the field from an image file and determine obstacles through blob detection.
      *
-     * @throws InvalidArgumentException: User-provided arguments are invalid
+     * @throws IllegalArgumentException: User-provided arguments are invalid
      * @throws IOException:              Unable to open image file from given path
      */
-    private void loadFieldFromFile() throws InvalidArgumentException, IOException {
+    private void loadFieldFromFile() throws IllegalArgumentException, IOException {
         // Preliminary variable checking
         if (freeSpaceChannelTolerance < 0 || freeSpaceChannelTolerance > 255
                 || blobColorChannelTolerance < 0 || blobColorChannelTolerance > 255) {
-            throw new InvalidArgumentException(new String[]{"Tolerances must be in between 0 and 255!"});
+            throw new IllegalArgumentException("Tolerances must be in between 0 and 255!");
         }
 
         if (borderDetectionFactor < 0) {
-            throw new InvalidArgumentException(new String[]{"Border detection factor must be greater than 0!"});
+            throw new IllegalArgumentException("Border detection factor must be greater than 0!");
         }
 
         // Read in the image file
         fieldDrawing = ImageIO.read(new File(fieldDrawingPath));
 
         if (fieldWidthPixels + translatedOrigin.getX() > fieldDrawing.getWidth()) {
-            throw new InvalidArgumentException(new String[]{"Specified field width in pixels is larger than the width of the field image in pixels!"});
+            throw new IllegalArgumentException("Specified field width in pixels is larger than the width of the field image in pixels!");
         }
 
         if (fieldHeightPixels + translatedOrigin.getY() > fieldDrawing.getHeight()) {
-            throw new InvalidArgumentException(new String[]{"Specified field height in pixels is larger than the height of the field image in pixels!"});
+            throw new IllegalArgumentException("Specified field height in pixels is larger than the height of the field image in pixels!");
         }
 
         if (fieldWidthPixels < 0) {

@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/Path-Planning.iml" filepath="$PROJECT_DIR$/Path-Planning.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Path-Planning_main.iml" filepath="$PROJECT_DIR$/.idea/modules/Path-Planning_main.iml" group="Path-Planning" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Path-Planning_test.iml" filepath="$PROJECT_DIR$/.idea/modules/Path-Planning_test.iml" group="Path-Planning" />
+      <module fileurl="file://$PROJECT_DIR$/src/main/main.iml" filepath="$PROJECT_DIR$/src/main/main.iml" />
     </modules>
   </component>
 </project>
