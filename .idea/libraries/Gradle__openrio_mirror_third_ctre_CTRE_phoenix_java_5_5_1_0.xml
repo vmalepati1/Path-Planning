@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: openrio.mirror.third.ctre:CTRE-phoenix-java:5.5.1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../DeepSpace/DeepSpaceRobot/.gradle/caches/modules-2/files-2.1/openrio.mirror.third.ctre/CTRE-phoenix-java/5.5.1.0/5089b4279af4e1c992e855c0af38a365d50057f2/CTRE-phoenix-java-5.5.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../DeepSpace/DeepSpaceRobot/.gradle/caches/modules-2/files-2.1/openrio.mirror.third.ctre/CTRE-phoenix-java/5.5.1.0/7e777ddb7dc51b40e528d6bc3864ab50010fc6de/CTRE-phoenix-java-5.5.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

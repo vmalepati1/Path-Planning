@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: edu.wpi.first.ntcore:ntcore-java:4.1.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../DeepSpace/DeepSpaceRobot/.gradle/caches/modules-2/files-2.1/edu.wpi.first.ntcore/ntcore-java/4.1.0/52e7d8449aacb56e104020f10b39f33549177078/ntcore-java-4.1.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$PROJECT_DIR$/../DeepSpace/DeepSpaceRobot/.gradle/caches/modules-2/files-2.1/edu.wpi.first.ntcore/ntcore-java/4.1.0/af2f67e3ca637328b5d87a2ca66f3cc7eed0bb9/ntcore-java-4.1.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
