@@ -101,14 +101,14 @@ public class LineSegment implements Serializable {
     }
 
     public Vector2f getIntersectionPoint(LineSegment other) {
-        if (other.getPoint1().equals(point1) || other.point2.equals(point1)) return point1;
-        if (other.getPoint1().equals(point2) || other.point2.equals(point2)) return point2;
+        if (other.getPoint1().equals(point1) || other.getPoint2().equals(point1)) return point1;
+        if (other.getPoint1().equals(point2) || other.getPoint2().equals(point2)) return point2;
 
         double pSlope = (point1.getY() - point2.getY()) / (point1.getX() - point2.getX());
-        double oSlope = (other.point1.getY() - other.point2.getY()) / (other.point1.getX() - other.point2.getX());
+        double oSlope = (other.getPoint1().getY() - other.getPoint2().getY()) / (other.getPoint1().getX() - other.getPoint2().getX());
 
         if (other.getPoint1().getX() == other.getPoint2().getX()) {
-            if (point1.getX() == point1.getX()) {
+            if (point1.getX() == point2.getX()) {
                 return null;
             }
 
@@ -138,7 +138,12 @@ public class LineSegment implements Serializable {
         Vector2f ip = getIntersectionPoint(edge);
 
         if (ip != null) {
-            return edge.getPoint1().distanceTo(point1);
+            System.out.println(edge);
+            System.out.println(point1);
+            System.out.println(ip);
+            System.out.println(point1.getPolygonID());
+            System.out.println(edge.point1.getPolygonID());
+            return point1.distanceTo(ip);
         }
 
         return 0;

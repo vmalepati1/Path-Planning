@@ -41,6 +41,9 @@ public class FieldViewer extends JPanel {
      * Converts convex-hull obstacles with coordinates respective to origin in bottom-left corner to polygon objects with pixel coordinates.
      */
     private void convertObstaclesToPolygons() {
+        System.out.println(obstacles.get(18).getEdges());
+        System.out.println(obstacles.get(34).getEdges());
+
         for (ConvexHull cvh : obstacles) {
             Polygon p = new Polygon();
 
@@ -58,11 +61,34 @@ public class FieldViewer extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        /*
         g.setColor(Color.BLUE);
+
+        g.drawPolygon(polygons.get(34));
+
+        g.setColor(Color.RED);
+
+        g.drawPolygon(polygons.get(18));
+
+        g.setColor(Color.ORANGE);
+        */
+
+        g.setColor(Color.BLUE);
+        System.out.println(polygons.get(18).npoints);
+        System.out.println(polygons.get(34).npoints);
+
+        for (int i = 0; i < polygons.get(18).npoints; i++) {
+            g.drawRect(polygons.get(18).xpoints[i], polygons.get(18).ypoints[i], 1, 1);
+        }
+
+        g.setColor(Color.RED);
+        for (int i = 0; i < polygons.get(34).npoints; i++) {
+            g.drawRect(polygons.get(34).xpoints[i], polygons.get(34).ypoints[i], 1, 1);
+        }
 
         // Draw all polygons (obstacles)
         for (Polygon p : polygons) {
-            g.fillPolygon(p);
+            //g.fillPolygon(p);
         }
     }
 

@@ -1,9 +1,11 @@
 package org.waltonrobotics.planning.combinatorial;
 
+import org.waltonrobotics.field.Field;
 import org.waltonrobotics.geometry.ConvexHull;
 import org.waltonrobotics.geometry.LineSegment;
 import org.waltonrobotics.geometry.Vector2f;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,6 +64,9 @@ public class CSpaceSlice {
         List<Vector2f> vertices = cSpaceObstacles.stream().flatMap(x -> x.getConvexPoints().stream()).collect(Collectors.toList());
         List<LineSegment> edges = cSpaceObstacles.stream().flatMap(x -> x.getEdges().stream()).collect(Collectors.toList());
 
+        System.out.println(cSpaceObstacles.get(34).getEdges());
+        System.out.println(cSpaceObstacles.get(18).getEdges());
+
         List<Vector2f> nodes = VisibilityGraph.calculateVisibilityGraph(vertices, edges, cSpaceObstacles);
     }
 
@@ -70,9 +75,9 @@ public class CSpaceSlice {
 
         robot.begin();
         robot.addPoint(new Vector2f(0.0, 0.0));
-        robot.addPoint(new Vector2f(1.0, 0.0));
-        robot.addPoint(new Vector2f(1.0, 1.0));
-        robot.addPoint(new Vector2f(0.0, 1.0));
+        robot.addPoint(new Vector2f(0.1, 0.0));
+        robot.addPoint(new Vector2f(0.1, 0.1));
+        robot.addPoint(new Vector2f(0.0, 0.1));
         robot.end();
 
         List<ConvexHull> obstacles = new ArrayList<>();
@@ -90,15 +95,22 @@ public class CSpaceSlice {
 
         ConvexHull obstacle2 = new ConvexHull();
         obstacle2.begin();
-        obstacle2.addPoint(new Vector2f(8.0, 8.0));
-        obstacle2.addPoint(new Vector2f(9.0, 8.0));
-        obstacle2.addPoint(new Vector2f(9.0, 9.0));
-        obstacle2.addPoint(new Vector2f(8.0, 9.0));
+        obstacle2.addPoint(new Vector2f(3.0, 5.0));
+        obstacle2.addPoint(new Vector2f(4.0, 5.0));
+        obstacle2.addPoint(new Vector2f(4.0, 6.0));
+        obstacle2.addPoint(new Vector2f(3.0, 6.0));
         obstacle2.end();
 
         obstacles.add(obstacle2);
 
-        CSpaceSlice slice = new CSpaceSlice(robot, Math.toRadians(0.0), obstacles);
+        Field field = null;
+        try {
+            field = new Field("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        CSpaceSlice slice = new CSpaceSlice(robot, Math.toRadians(0.0), field.getObstacles());
     }
 
 }

@@ -77,7 +77,7 @@ public class VisibilityGraph {
         for (LineSegment e : edges) {
             if (e.getPoint1().equals(point) || e.getPoint2().equals(point)) continue;
 
-            if (e.doesIntersect(scanLine)) {
+            if (scanLine.doesIntersect(e)) {
                 if (onSegment(point, e.getPoint1(), pointInf)) continue;
                 if (onSegment(point, e.getPoint2(), pointInf)) continue;
                 openEdges.insert(point, pointInf, e);

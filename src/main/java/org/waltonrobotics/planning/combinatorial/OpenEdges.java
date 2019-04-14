@@ -39,6 +39,7 @@ public class OpenEdges {
 
         while (low < high) {
             int mid = (low + high) / 2;
+
             if (lessThan(halfLineOrigin, w, edge, openEdges.get(mid))) {
                 high = mid;
             } else{
