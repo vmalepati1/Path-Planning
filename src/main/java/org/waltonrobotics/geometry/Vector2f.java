@@ -8,12 +8,30 @@ import java.io.Serializable;
 public class Vector2f implements Serializable {
 
     private double x, y;
+    private int polygonID;
+
+    public int getPolygonID() {
+        return polygonID;
+    }
+
+    public void setPolygonID(int polygonID) {
+        this.polygonID = polygonID;
+    }
 
     /**
      * Creates a new zero vector.
      */
     public Vector2f() {
         set(0, 0);
+        this.polygonID = -1;
+    }
+
+    /**
+     * Creates a new zero vector.
+     */
+    public Vector2f(int polygonID) {
+        set(0, 0);
+        this.polygonID = polygonID;
     }
 
     /**
@@ -23,6 +41,7 @@ public class Vector2f implements Serializable {
      */
     public Vector2f(Vector2f vector) {
         set(vector.x, vector.y);
+        this.polygonID = vector.polygonID;
     }
 
     /**
@@ -37,6 +56,18 @@ public class Vector2f implements Serializable {
     }
 
     /**
+     * Creates a new vector from x and y coordinates.
+     *
+     * @param x: X coordinate
+     * @param y: Y coordinate
+     */
+    public Vector2f(double x, double y, int polygonID) {
+        this.x = x;
+        this.y = y;
+        this.polygonID = polygonID;
+    }
+
+    /**
      * Creates a scalar vector.
      *
      * @param scalar: Scalar value
@@ -44,6 +75,17 @@ public class Vector2f implements Serializable {
     public Vector2f(double scalar) {
         this.x = scalar;
         this.y = scalar;
+    }
+
+    /**
+     * Creates a scalar vector.
+     *
+     * @param scalar: Scalar value
+     */
+    public Vector2f(double scalar, int polygonID) {
+        this.x = scalar;
+        this.y = scalar;
+        this.polygonID = polygonID;
     }
 
     /**
@@ -201,6 +243,16 @@ public class Vector2f implements Serializable {
         return x * other.x + y * other.y;
     }
 
+
+    /**
+     * Finds distance between this point and another point
+     * @param other: Other point
+     * @return Distance from this point to other point
+     */
+    public double distanceTo(Vector2f other) {
+        return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
+    }
+
     /**
      * Performs vector triple product using expansion.
      *
@@ -225,7 +277,7 @@ public class Vector2f implements Serializable {
     /**
      * @return Normalized vector of this vector
      */
-    public Vector2f normalise() {
+    public Vector2f normalize() {
         double length = magnitude();
         return new Vector2f(x / length, y / length);
     }
