@@ -64,7 +64,7 @@ public class VisibilityGraph {
 
         sortedVertices.sort(new CCWHalfLineComparator(point));
 
-        //System.out.println(sortedVertices);
+        System.out.println(sortedVertices);
 
         OpenEdges openEdges = new OpenEdges();
 
@@ -176,6 +176,7 @@ public class VisibilityGraph {
 
     private static boolean polygonCrossing(Vector2f midPoint, ConvexHull convexHull) {
         Vector2f p2 = new Vector2f(Double.POSITIVE_INFINITY, midPoint.getY());
+
         int intersectCount = 0;
 
         for (LineSegment e : convexHull.getEdges()) {
@@ -200,7 +201,7 @@ public class VisibilityGraph {
             }
         }
 
-        return intersectCount % 2 == 0;
+        return intersectCount % 2 != 0;
     }
 
     public static int isCCW(LineSegment scanLine, Vector2f adjacentPoint) {

@@ -62,7 +62,7 @@ public class CSpaceSlice {
         List<Vector2f> vertices = cSpaceObstacles.stream().flatMap(x -> x.getConvexPoints().stream()).collect(Collectors.toList());
         List<LineSegment> edges = cSpaceObstacles.stream().flatMap(x -> x.getEdges().stream()).collect(Collectors.toList());
 
-        List<Vector2f> nodes = VisibilityGraph.calculateVisibilityGraph(vertices, edges, obstacles);
+        List<Vector2f> nodes = VisibilityGraph.calculateVisibilityGraph(vertices, edges, cSpaceObstacles);
     }
 
     public static void main(String[] args) {
