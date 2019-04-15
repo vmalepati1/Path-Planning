@@ -49,8 +49,9 @@ public class CSpaceSlice {
 
             for (Vector2f obstacleV : cvh.getConvexPoints()) {
                 for (Vector2f robotV : transformedRobot.getConvexPoints()) {
-                    cSpaceObstacle.addPoint(new Vector2f(obstacleV.getX() - robotV.getX(), obstacleV.getY() - robotV.getY(), polygonID));
+                    //cSpaceObstacle.addPoint(new Vector2f(obstacleV.getX() - robotV.getX(), obstacleV.getY() - robotV.getY(), polygonID));
                 }
+                cSpaceObstacle.addPoint(new Vector2f(obstacleV.getX(), obstacleV.getY(), polygonID));
             }
 
             cSpaceObstacle.end();
@@ -63,9 +64,6 @@ public class CSpaceSlice {
         // Get all the obstacle vertices into one list
         List<Vector2f> vertices = cSpaceObstacles.stream().flatMap(x -> x.getConvexPoints().stream()).collect(Collectors.toList());
         List<LineSegment> edges = cSpaceObstacles.stream().flatMap(x -> x.getEdges().stream()).collect(Collectors.toList());
-
-        System.out.println(cSpaceObstacles.get(34).getEdges());
-        System.out.println(cSpaceObstacles.get(18).getEdges());
 
         List<Vector2f> nodes = VisibilityGraph.calculateVisibilityGraph(vertices, edges, cSpaceObstacles);
     }
@@ -105,7 +103,7 @@ public class CSpaceSlice {
 
         Field field = null;
         try {
-            field = new Field("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
+            field = new Field("C:\\Users\\Vikas Malepati\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

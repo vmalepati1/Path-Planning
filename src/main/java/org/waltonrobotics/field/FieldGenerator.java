@@ -118,7 +118,7 @@ public class FieldGenerator {
     public static void main(String[] args) {
         FieldGenerator testFieldGenerator = null;
         try {
-            testFieldGenerator = new FieldGenerator("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceFieldDrawing.png",
+            testFieldGenerator = new FieldGenerator("C:\\Users\\Vikas Malepati\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceFieldDrawing.png",
                     new Color(120, 120, 120),
                     20, 40,
                     0.1,
@@ -132,7 +132,7 @@ public class FieldGenerator {
         testFieldGenerator.displayField();
 
         try {
-            testFieldGenerator.saveFieldToFile("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
+            testFieldGenerator.saveFieldToFile("C:\\Users\\Vikas Malepati\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -90,12 +90,10 @@ public class VisibilityGraph {
         for (Vector2f p : sortedVertices) {
             if (p.equals(point)) continue;
 
-            scanLine = new LineSegment(point, p);
-
             if (!openEdges.getOpenEdges().isEmpty()) {
                 for (LineSegment e : edges) {
                     if (e.getPoint1().equals(p) || e.getPoint2().equals(p)) {
-                        if (isCCW(scanLine, e.getAdjacent(p)) == -1) {
+                        if (isCCW(point, p, e.getAdjacent(p)) == -1) {
                             openEdges.delete(point, p, e);
                         }
                     }
@@ -104,7 +102,7 @@ public class VisibilityGraph {
 
             boolean isVisible = false;
 
-            if (previous == null || isCCW(new LineSegment(point, previous), p) != 0 || !onSegment(point, previous, p)) {
+            if (previous == null || isCCW(point, previous, p) != 0 || !onSegment(point, previous, p)) {
                 if (openEdges.getOpenEdges().size() == 0) {
                     isVisible = true;
                 } else if (!scanLine.doesIntersect(openEdges.smallest())) {
@@ -147,7 +145,7 @@ public class VisibilityGraph {
 
             for (LineSegment e : edges) {
                 if (!e.getPoint1().equals(point) && !e.getPoint2().equals(point) && e.getAdjacent(p) != null) {
-                    if (isCCW(scanLine, e.getAdjacent(p)) == 1) {
+                    if (isCCW(point, p, e.getAdjacent(p)) == 1) {
                         openEdges.insert(point, p, e);
                     }
                 }
@@ -184,8 +182,8 @@ public class VisibilityGraph {
             if (midPoint.getY() > e.getPoint1().getY() && midPoint.getY() > e.getPoint2().getY()) continue;
             if (midPoint.getX() > e.getPoint1().getX() && midPoint.getX() > e.getPoint2().getX()) continue;
 
-            boolean edgeP1Collinear = (isCCW(new LineSegment(midPoint, e.getPoint1()), p2) == 0);
-            boolean edgeP2Collinear = (isCCW(new LineSegment(midPoint, e.getPoint2()), p2) == 0);
+            boolean edgeP1Collinear = (isCCW(midPoint, e.getPoint1(), p2) == 0);
+            boolean edgeP2Collinear = (isCCW(midPoint, e.getPoint2(), p2) == 0);
 
             LineSegment scanLine = new LineSegment(midPoint, p2);
 
@@ -204,9 +202,8 @@ public class VisibilityGraph {
         return intersectCount % 2 != 0;
     }
 
-    public static int isCCW(LineSegment scanLine, Vector2f adjacentPoint) {
-        double area = ((scanLine.getPoint2().getX() - scanLine.getPoint1().getX()) * (adjacentPoint.getY() - scanLine.getPoint1().getY()) -
-                (scanLine.getPoint2().getY() - scanLine.getPoint1().getY()) * (adjacentPoint.getX() - scanLine.getPoint1().getX()));
+    public static int isCCW(Vector2f a, Vector2f b, Vector2f c) {
+        double area = ((b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX()));
 
         if (area > 0) return 1;
         if (area < 0) return -1;

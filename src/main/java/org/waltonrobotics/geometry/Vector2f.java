@@ -78,17 +78,6 @@ public class Vector2f implements Serializable {
     }
 
     /**
-     * Creates a scalar vector.
-     *
-     * @param scalar: Scalar value
-     */
-    public Vector2f(double scalar, int polygonID) {
-        this.x = scalar;
-        this.y = scalar;
-        this.polygonID = polygonID;
-    }
-
-    /**
      * Sets vector to specified x and y coordinates.
      *
      * @param x: X coordinate to set to
