@@ -14,13 +14,39 @@ public class VisibilityGraph {
 
         private Vector2f halfLineOrigin;
 
-        public CCWHalfLineComparator(Vector2f halfLineOrigin) {
+        private CCWHalfLineComparator(Vector2f halfLineOrigin) {
             this.halfLineOrigin = halfLineOrigin;
         }
 
         private double getAngleFromHalfLineToPoint(Vector2f point) {
-            double angle = Math.toDegrees(Math.atan2(point.getY() - halfLineOrigin.getY(), point.getX() - halfLineOrigin.getX()));
-            return (angle %= 360) < 0 ? angle + 360 : angle;
+            double dx = point.getX() - halfLineOrigin.getX();
+            double dy = point.getY() - halfLineOrigin.getY();
+
+            if (dx == 0) {
+                if (dy < 0) {
+                    return Math.PI * 3 / 2;
+                }
+
+                return Math.PI / 2;
+            }
+
+            if (dy == 0) {
+                if (dx < 0) {
+                    return Math.PI;
+                }
+
+                return 0;
+            }
+
+            if (dx < 0) {
+                return Math.PI + Math.atan(dy / dx);
+            }
+
+            if (dy < 0) {
+                return 2 * Math.PI + Math.atan(dy / dx);
+            }
+
+            return Math.atan(dy / dx);
         }
 
         @Override
@@ -33,12 +59,12 @@ public class VisibilityGraph {
             } else if (v1CCWAngle < v2CCWAngle) {
                 return -1;
             } else {
-                double v1ToHalfLineOrigin = v1.distanceTo(halfLineOrigin);
-                double v2ToHalfLineOrigin = v2.distanceTo(halfLineOrigin);
+                double halfLineOriginToV1 = halfLineOrigin.distanceTo(v1);
+                double halfLineOriginToV2 = halfLineOrigin.distanceTo(v2);
 
-                if (v1ToHalfLineOrigin > v2ToHalfLineOrigin) {
+                if (halfLineOriginToV1 > halfLineOriginToV2) {
                     return 1;
-                } else if (v1ToHalfLineOrigin < v2ToHalfLineOrigin) {
+                } else if (halfLineOriginToV1 < halfLineOriginToV2) {
                     return -1;
                 }
             }
@@ -48,14 +74,11 @@ public class VisibilityGraph {
 
     }
 
-    public static List<Vector2f> calculateVisibilityGraph(List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles) {
-        List<Vector2f> visibilityGraph = new ArrayList<>();
-
+    // TODO: Create proper graph data structure
+    public static void calculateVisibilityGraph(List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles) {
         for (Vector2f v : vertices) {
-            visibilityGraph.addAll(getVisibleVertices(v, vertices, edges, obstacles));
+            getVisibleVertices(v, vertices, edges, obstacles);
         }
-
-        return visibilityGraph;
     }
 
     private static List<Vector2f> getVisibleVertices(Vector2f point, List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles) {
@@ -64,20 +87,14 @@ public class VisibilityGraph {
 
         sortedVertices.sort(new CCWHalfLineComparator(point));
 
-        System.out.println(sortedVertices);
-
         OpenEdges openEdges = new OpenEdges();
 
         Vector2f pointInf = new Vector2f(Double.POSITIVE_INFINITY, point.getY());
 
-        LineSegment scanLine = new LineSegment(point, pointInf);
-
-        //System.out.println(edges);
-
         for (LineSegment e : edges) {
             if (e.getPoint1().equals(point) || e.getPoint2().equals(point)) continue;
 
-            if (scanLine.doesIntersect(e)) {
+            if (edgeIntersect(point, pointInf, e)) {
                 if (onSegment(point, e.getPoint1(), pointInf)) continue;
                 if (onSegment(point, e.getPoint2(), pointInf)) continue;
                 openEdges.insert(point, pointInf, e);
@@ -105,7 +122,7 @@ public class VisibilityGraph {
             if (previous == null || isCCW(point, previous, p) != 0 || !onSegment(point, previous, p)) {
                 if (openEdges.getOpenEdges().size() == 0) {
                     isVisible = true;
-                } else if (!scanLine.doesIntersect(openEdges.smallest())) {
+                } else if (!edgeIntersect(point, p, openEdges.smallest())) {
                     isVisible = true;
                 }
             } else if (!previousVisible) {
@@ -114,8 +131,7 @@ public class VisibilityGraph {
                 isVisible = true;
 
                 for (LineSegment e : openEdges.getOpenEdges()) {
-                    LineSegment previousToCurrent = new LineSegment(previous, p);
-                    if (!e.getPoint1().equals(previous) && !e.getPoint2().equals(previous) && previousToCurrent.doesIntersect(e)) {
+                    if (!e.getPoint1().equals(previous) && !e.getPoint2().equals(previous) && edgeIntersect(previous, p, e)) {
                         isVisible = false;
                         break;
                     }
@@ -132,18 +148,7 @@ public class VisibilityGraph {
                 if (e.getPoint1().equals(point) || e.getPoint2().equals(point)) {
                     adjacentPoints.add(e.getAdjacent(point));
                 }
-            }
 
-            if (isVisible && !adjacentPoints.contains(p)) {
-                isVisible = !edgeInPolygon(point, p, obstacles);
-            }
-
-            if (isVisible) {
-                visibleVertices.add(p);
-                System.out.println(point + " -> " + p);
-            }
-
-            for (LineSegment e : edges) {
                 if (!e.getPoint1().equals(point) && !e.getPoint2().equals(point) && e.getAdjacent(p) != null) {
                     if (isCCW(point, p, e.getAdjacent(p)) == 1) {
                         openEdges.insert(point, p, e);
@@ -151,11 +156,48 @@ public class VisibilityGraph {
                 }
             }
 
+            if (isVisible && !adjacentPoints.contains(p)) {
+                isVisible = !edgeInPolygon(point, p, obstacles);
+            }
+
+            if (isVisible) {
+                System.out.println(point + " -> " + p);
+                visibleVertices.add(p);
+            }
+
             previous = p;
             previousVisible = isVisible;
         }
 
         return visibleVertices;
+    }
+
+    public static boolean edgeIntersect(Vector2f p1, Vector2f q1, LineSegment edge) {
+        Vector2f p2 = edge.getPoint1();
+        Vector2f q2 = edge.getPoint2();
+
+        int o1 = isCCW(p1, q1, p2);
+        int o2 = isCCW(p1, q1, q2);
+        int o3 = isCCW(p2, q2, p1);
+        int o4 = isCCW(p2, q2, q1);
+
+        if (o1 != o2 && o3 != o4) {
+            return true;
+        }
+
+        if (o1 == 0 && onSegment(p1, p2, q1)) {
+            return true;
+        }
+
+        if (o2 == 0 && onSegment(p1, q2, q1)) {
+            return true;
+        }
+
+        if (o3 == 0 && onSegment(p2, p1, q2)) {
+            return true;
+        }
+
+        return o4 == 0 && onSegment(p2, q1, q2);
     }
 
     private static boolean edgeInPolygon(Vector2f p1, Vector2f p2, List<ConvexHull> obstacles) {
@@ -185,8 +227,6 @@ public class VisibilityGraph {
             boolean edgeP1Collinear = (isCCW(midPoint, e.getPoint1(), p2) == 0);
             boolean edgeP2Collinear = (isCCW(midPoint, e.getPoint2(), p2) == 0);
 
-            LineSegment scanLine = new LineSegment(midPoint, p2);
-
             if (edgeP1Collinear && edgeP2Collinear) continue;
             if (edgeP1Collinear || edgeP2Collinear) {
                 Vector2f collinearPoint = edgeP1Collinear ? e.getPoint1() : e.getPoint2();
@@ -194,7 +234,7 @@ public class VisibilityGraph {
                 if (e.getAdjacent(collinearPoint).getY() > midPoint.getY()) {
                     intersectCount++;
                 }
-            } else if (scanLine.doesIntersect(e)) {
+            } else if (edgeIntersect(midPoint, p2, e)) {
                 intersectCount++;
             }
         }

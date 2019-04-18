@@ -1,7 +1,5 @@
 package org.waltonrobotics.geometry;
 
-import org.waltonrobotics.planning.combinatorial.VisibilityGraph;
-
 import java.io.Serializable;
 
 public class LineSegment implements Serializable {
@@ -15,41 +13,6 @@ public class LineSegment implements Serializable {
         this.point2 = point2;
 
         calculateSlope();
-    }
-
-    public boolean doesIntersect(LineSegment other) {
-        Vector2f p2 = other.getPoint1();
-        Vector2f q2 = other.getPoint2();
-
-        Vector2f p1 = point1;
-        Vector2f q1 = point2;
-
-        int o1 = VisibilityGraph.isCCW(p1, q1, p2);
-        int o2 = VisibilityGraph.isCCW(p1, q1, q2);
-        int o3 = VisibilityGraph.isCCW(p2, q2, p1);
-        int o4 = VisibilityGraph.isCCW(p2, q2, q1);
-
-        if (o1 != o2 && o3 != o4) {
-            return true;
-        }
-
-        if (o1 == 0 && VisibilityGraph.onSegment(p1, p2, q1)) {
-            return true;
-        }
-
-        if (o2 == 0 && VisibilityGraph.onSegment(p1, q2, q1)) {
-            return true;
-        }
-
-        if (o3 == 0 && VisibilityGraph.onSegment(p2, p1, q2)) {
-            return true;
-        }
-
-        if (o4 == 0 && VisibilityGraph.onSegment(p2, q1, q2)) {
-            return true;
-        }
-
-        return false;
     }
 
     public Vector2f getPoint1() {

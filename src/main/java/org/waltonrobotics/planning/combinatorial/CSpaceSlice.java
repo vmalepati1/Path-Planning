@@ -49,9 +49,8 @@ public class CSpaceSlice {
 
             for (Vector2f obstacleV : cvh.getConvexPoints()) {
                 for (Vector2f robotV : transformedRobot.getConvexPoints()) {
-                    //cSpaceObstacle.addPoint(new Vector2f(obstacleV.getX() - robotV.getX(), obstacleV.getY() - robotV.getY(), polygonID));
+                    cSpaceObstacle.addPoint(new Vector2f(obstacleV.getX() - robotV.getX(), obstacleV.getY() - robotV.getY(), polygonID));
                 }
-                cSpaceObstacle.addPoint(new Vector2f(obstacleV.getX(), obstacleV.getY(), polygonID));
             }
 
             cSpaceObstacle.end();
@@ -65,7 +64,7 @@ public class CSpaceSlice {
         List<Vector2f> vertices = cSpaceObstacles.stream().flatMap(x -> x.getConvexPoints().stream()).collect(Collectors.toList());
         List<LineSegment> edges = cSpaceObstacles.stream().flatMap(x -> x.getEdges().stream()).collect(Collectors.toList());
 
-        List<Vector2f> nodes = VisibilityGraph.calculateVisibilityGraph(vertices, edges, cSpaceObstacles);
+        VisibilityGraph.calculateVisibilityGraph(vertices, edges, cSpaceObstacles);
     }
 
     public static void main(String[] args) {
@@ -78,32 +77,9 @@ public class CSpaceSlice {
         robot.addPoint(new Vector2f(0.0, 0.1));
         robot.end();
 
-        List<ConvexHull> obstacles = new ArrayList<>();
-
-        ConvexHull obstacle = new ConvexHull();
-
-        obstacle.begin();
-        obstacle.addPoint(new Vector2f(3.0, 3.0));
-        obstacle.addPoint(new Vector2f(4.0, 3.0));
-        obstacle.addPoint(new Vector2f(4.0, 4.0));
-        obstacle.addPoint(new Vector2f(3.0, 4.0));
-        obstacle.end();
-
-        obstacles.add(obstacle);
-
-        ConvexHull obstacle2 = new ConvexHull();
-        obstacle2.begin();
-        obstacle2.addPoint(new Vector2f(3.0, 5.0));
-        obstacle2.addPoint(new Vector2f(4.0, 5.0));
-        obstacle2.addPoint(new Vector2f(4.0, 6.0));
-        obstacle2.addPoint(new Vector2f(3.0, 6.0));
-        obstacle2.end();
-
-        obstacles.add(obstacle2);
-
         Field field = null;
         try {
-            field = new Field("C:\\Users\\Vikas Malepati\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
+            field = new Field("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }

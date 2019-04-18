@@ -24,6 +24,9 @@ public class OpenEdges {
 
     public void delete(Vector2f halfLineOrigin, Vector2f w, LineSegment edge) {
         int index = index(halfLineOrigin, w, edge) - 1;
+
+        if (index < 0 || index >= openEdges.size()) return;
+
         if (openEdges.get(index).equals(edge)) {
             openEdges.remove(index);
         }
@@ -50,15 +53,6 @@ public class OpenEdges {
         return low;
     }
 
-    private double angleBetween(Vector2f a, Vector2f b, Vector2f c) {
-        double first = Math.pow((c.getX() - b.getX()), 2) + Math.pow(c.getY() - b.getY(), 2);
-        double second = Math.pow((c.getX() - a.getX()), 2) + Math.pow(c.getY() - a.getY(), 2);
-        double third = Math.pow((b.getX() - a.getX()), 2) + Math.pow(b.getY() - a.getY(), 2);
-        double cosValue = (first + third - second) / (2 * Math.sqrt(first) * Math.sqrt(third));
-        return Math.acos(cosValue);
-
-    }
-
     private boolean lessThan(Vector2f halfLineOrigin, Vector2f w, LineSegment edge1, LineSegment edge2) {
         if (edge1.equals(edge2)) {
             return false;
@@ -66,7 +60,7 @@ public class OpenEdges {
 
         LineSegment scanLine = new LineSegment(halfLineOrigin, w);
 
-        if (!scanLine.doesIntersect(edge2)) {
+        if (!VisibilityGraph.edgeIntersect(halfLineOrigin, w, edge2)) {
             return true;
         }
 
@@ -82,20 +76,10 @@ public class OpenEdges {
         }
 
         if (edgeDist1 == edgeDist2) {
-            Vector2f samePoint;
+            double maxDistanceFromHalfLineOrigin1 = Math.max(edge1.getPoint1().distanceTo(halfLineOrigin), edge1.getPoint2().distanceTo(halfLineOrigin));
+            double maxDistanceFromHalfLineOrigin2 = Math.max(edge2.getPoint1().distanceTo(halfLineOrigin), edge2.getPoint2().distanceTo(halfLineOrigin));
 
-            if (edge2.getPoint1().equals(edge1.getPoint1()) || edge2.getPoint2().equals(edge1.getPoint1())) {
-                samePoint = edge1.getPoint1();
-            } else {
-                samePoint = edge1.getPoint2();
-            }
-
-            double angleEdge1 = angleBetween(halfLineOrigin, w, edge1.getAdjacent(samePoint));
-            double angleEdge2 = angleBetween(halfLineOrigin, w, edge2.getAdjacent(samePoint));
-
-            if (angleEdge1 < angleEdge2) {
-                return true;
-            }
+            return maxDistanceFromHalfLineOrigin1 < maxDistanceFromHalfLineOrigin2;
         }
 
         return false;
