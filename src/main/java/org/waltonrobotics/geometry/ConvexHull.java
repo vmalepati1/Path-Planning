@@ -12,6 +12,17 @@ public class ConvexHull implements Serializable {
     private List<Vector2f> convexPoints;
     private List<LineSegment> edges;
 
+    private static Comparator<Vector2f> rightBottomComparator = (v1, v2) -> {
+        int compareX = v1.compareX(v2);
+        int compareY = v1.compareY(v2);
+
+        if (compareX == 0) {
+            return compareY;
+        }
+
+        return compareX;
+    };
+
     /**
      * Constructs a new convex hull.
      */
@@ -53,7 +64,7 @@ public class ConvexHull implements Serializable {
         Stack<Vector2f> resultStack = new Stack<>();
 
         // Sort given points by increasing x-coordinate and then y-coordinate
-        sortedPoints.sort(new RightBottomComparator());
+        sortedPoints.sort(rightBottomComparator);
 
         // Total n points
         int totalPoints = sortedPoints.size();
@@ -261,25 +272,6 @@ public class ConvexHull implements Serializable {
 
         // Return absolute value
         return Math.abs(area / 2.0);
-    }
-
-    /**
-     * Comparator used for sorting points by increasing x-coordinate and then increasing y-coordinate.
-     */
-    private static class RightBottomComparator implements Comparator<Vector2f> {
-
-        @Override
-        public int compare(Vector2f v1, Vector2f v2) {
-            int compareX = v1.compareX(v2);
-            int compareY = v1.compareY(v2);
-
-            if (compareX == 0) {
-                return compareY;
-            }
-
-            return compareX;
-        }
-
     }
 
 }

@@ -2,11 +2,10 @@ package org.waltonrobotics.planning.combinatorial;
 
 import org.waltonrobotics.geometry.ConvexHull;
 import org.waltonrobotics.geometry.LineSegment;
+import org.waltonrobotics.geometry.Pose;
 import org.waltonrobotics.geometry.Vector2f;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 public class VisibilityGraph {
 
@@ -74,14 +73,67 @@ public class VisibilityGraph {
 
     }
 
-    // TODO: Create proper graph data structure
-    public static void calculateVisibilityGraph(List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles) {
+    public List<Vector2f> getVertices() {
+        return vertices;
+    }
+
+    public List<LineSegment> getEdges() {
+        return edges;
+    }
+
+    public List<ConvexHull> getObstacles() {
+        return obstacles;
+    }
+
+    public double getRobotOrientationDegrees() {
+        return robotOrientationDegrees;
+    }
+
+    public Map<Pose, List<Pose>> getGraphAdjacencyList() {
+        return graphAdjacencyList;
+    }
+
+    private List<Vector2f> vertices;
+    private List<LineSegment> edges;
+    private List<ConvexHull> obstacles;
+    private double robotOrientationDegrees;
+    private Map<Pose, List<Pose>> graphAdjacencyList;
+
+    public VisibilityGraph(List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles, double robotOrientationDegrees) {
+        this.vertices = vertices;
+        this.edges = edges;
+        this.obstacles = obstacles;
+        this.robotOrientationDegrees = robotOrientationDegrees;
+
+        calculateVisibilityGraph();
+    }
+
+    private void calculateVisibilityGraph() {
+        graphAdjacencyList = new HashMap<>();
+
         for (Vector2f v : vertices) {
-            getVisibleVertices(v, vertices, edges, obstacles);
+            Pose source = new Pose(v.getX(), v.getY(), robotOrientationDegrees);
+
+            List<Pose> sourceAdjacent = new ArrayList<>();
+
+            for (Vector2f visibleVertex : getVisibleVertices(v, vertices, edges, obstacles)) {
+                Pose destination = new Pose(visibleVertex.getX(), visibleVertex.getY(), robotOrientationDegrees);
+                List<Pose> destinationAdjacent = graphAdjacencyList.get(source);
+
+                if (destinationAdjacent == null) {
+                    destinationAdjacent = new ArrayList<>();
+                }
+
+                sourceAdjacent.add(destination);
+                destinationAdjacent.add(source);
+
+                graphAdjacencyList.put(source, sourceAdjacent);
+                graphAdjacencyList.put(destination, destinationAdjacent);
+            }
         }
     }
 
-    private static List<Vector2f> getVisibleVertices(Vector2f point, List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles) {
+    private List<Vector2f> getVisibleVertices(Vector2f point, List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles) {
         List<Vector2f> sortedVertices = new ArrayList<>(vertices);
         List<Vector2f> visibleVertices = new ArrayList<>();
 
@@ -161,7 +213,6 @@ public class VisibilityGraph {
             }
 
             if (isVisible) {
-                System.out.println(point + " -> " + p);
                 visibleVertices.add(p);
             }
 
@@ -242,7 +293,7 @@ public class VisibilityGraph {
         return intersectCount % 2 != 0;
     }
 
-    public static int isCCW(Vector2f a, Vector2f b, Vector2f c) {
+    private static int isCCW(Vector2f a, Vector2f b, Vector2f c) {
         double area = ((b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX()));
 
         if (area > 0) return 1;
@@ -250,11 +301,9 @@ public class VisibilityGraph {
         return 0;
     }
 
-    public static boolean onSegment(Vector2f p, Vector2f q, Vector2f r) {
+    private static boolean onSegment(Vector2f p, Vector2f q, Vector2f r) {
         if (q.getX() <= Math.max(p.getX(), r.getX()) && (q.getX() >= Math.min(p.getX(), r.getX()))) {
-            if (q.getY() <= Math.max(p.getY(), r.getY()) && (q.getY() >= Math.min(p.getY(), r.getY()))) {
-                return true;
-            }
+            return q.getY() <= Math.max(p.getY(), r.getY()) && (q.getY() >= Math.min(p.getY(), r.getY()));
         }
 
         return false;
