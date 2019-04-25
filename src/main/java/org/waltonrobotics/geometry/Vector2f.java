@@ -271,6 +271,37 @@ public class Vector2f implements Serializable {
         return new Vector2f(x / length, y / length);
     }
 
+    public double angleTo(Vector2f other) {
+        double dx = other.getX() - this.getX();
+        double dy = other.getY() - this.getY();
+
+        if (dx == 0) {
+            if (dy < 0) {
+                return Math.PI * 3 / 2;
+            }
+
+            return Math.PI / 2;
+        }
+
+        if (dy == 0) {
+            if (dx < 0) {
+                return Math.PI;
+            }
+
+            return 0;
+        }
+
+        if (dx < 0) {
+            return Math.PI + Math.atan(dy / dx);
+        }
+
+        if (dy < 0) {
+            return 2 * Math.PI + Math.atan(dy / dx);
+        }
+
+        return Math.atan(dy / dx);
+    }
+
     /**
      * @return Negative of this vector
      */

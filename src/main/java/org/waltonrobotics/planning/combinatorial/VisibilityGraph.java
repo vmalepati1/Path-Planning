@@ -17,41 +17,10 @@ public class VisibilityGraph {
             this.halfLineOrigin = halfLineOrigin;
         }
 
-        private double getAngleFromHalfLineToPoint(Vector2f point) {
-            double dx = point.getX() - halfLineOrigin.getX();
-            double dy = point.getY() - halfLineOrigin.getY();
-
-            if (dx == 0) {
-                if (dy < 0) {
-                    return Math.PI * 3 / 2;
-                }
-
-                return Math.PI / 2;
-            }
-
-            if (dy == 0) {
-                if (dx < 0) {
-                    return Math.PI;
-                }
-
-                return 0;
-            }
-
-            if (dx < 0) {
-                return Math.PI + Math.atan(dy / dx);
-            }
-
-            if (dy < 0) {
-                return 2 * Math.PI + Math.atan(dy / dx);
-            }
-
-            return Math.atan(dy / dx);
-        }
-
         @Override
         public int compare(Vector2f v1, Vector2f v2) {
-            double v1CCWAngle = getAngleFromHalfLineToPoint(v1);
-            double v2CCWAngle = getAngleFromHalfLineToPoint(v2);
+            double v1CCWAngle = halfLineOrigin.angleTo(v1);
+            double v2CCWAngle = halfLineOrigin.angleTo(v2);
 
             if (v1CCWAngle > v2CCWAngle) {
                 return 1;
@@ -114,11 +83,15 @@ public class VisibilityGraph {
         for (Vector2f v : vertices) {
             Pose source = new Pose(v.getX(), v.getY(), robotOrientationDegrees);
 
-            List<Pose> sourceAdjacent = new ArrayList<>();
+            List<Pose> sourceAdjacent = graphAdjacencyList.get(source);
+
+            if (sourceAdjacent == null) {
+                sourceAdjacent = new ArrayList<>();
+            }
 
             for (Vector2f visibleVertex : getVisibleVertices(v, vertices, edges, obstacles)) {
                 Pose destination = new Pose(visibleVertex.getX(), visibleVertex.getY(), robotOrientationDegrees);
-                List<Pose> destinationAdjacent = graphAdjacencyList.get(source);
+                List<Pose> destinationAdjacent = graphAdjacencyList.get(destination);
 
                 if (destinationAdjacent == null) {
                     destinationAdjacent = new ArrayList<>();
@@ -158,6 +131,7 @@ public class VisibilityGraph {
 
         for (Vector2f p : sortedVertices) {
             if (p.equals(point)) continue;
+            if (point.angleTo(p) > Math.PI) continue;
 
             if (!openEdges.getOpenEdges().isEmpty()) {
                 for (LineSegment e : edges) {
@@ -200,12 +174,6 @@ public class VisibilityGraph {
                 if (e.getPoint1().equals(point) || e.getPoint2().equals(point)) {
                     adjacentPoints.add(e.getAdjacent(point));
                 }
-
-                if (!e.getPoint1().equals(point) && !e.getPoint2().equals(point) && e.getAdjacent(p) != null) {
-                    if (isCCW(point, p, e.getAdjacent(p)) == 1) {
-                        openEdges.insert(point, p, e);
-                    }
-                }
             }
 
             if (isVisible && !adjacentPoints.contains(p)) {
@@ -214,6 +182,16 @@ public class VisibilityGraph {
 
             if (isVisible) {
                 visibleVertices.add(p);
+            }
+
+            for (LineSegment e : edges) {
+                if (e.getPoint1().equals(p) || e.getPoint2().equals(p)) {
+                    if (!e.getPoint1().equals(point) && !e.getPoint2().equals(point) && e.getAdjacent(p) != null) {
+                        if (isCCW(point, p, e.getAdjacent(p)) == 1) {
+                            openEdges.insert(point, p, e);
+                        }
+                    }
+                }
             }
 
             previous = p;

@@ -10,26 +10,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class PathViewer extends JPanel {
 
     private int fieldWidthPixels;
     private int fieldHeightPixels;
     private FieldUnitConverter unitConverter;
-    private ArrayList<ConvexHull> obstacles;
+    private List<ConvexHull> obstacles;
     private ArrayList<Polygon> polygons;
     private List<Pose> path;
 
-    public PathViewer(int fieldWidthPixels, int fieldHeightPixels, FieldUnitConverter unitConverter, ArrayList<ConvexHull> obstacles, List<Pose> path) {
+    public PathViewer(int fieldWidthPixels, int fieldHeightPixels, FieldUnitConverter unitConverter, List<ConvexHull> obstacles, List<Pose> path) {
         this.fieldWidthPixels = fieldWidthPixels;
         this.fieldHeightPixels = fieldHeightPixels;
         this.unitConverter = unitConverter;
         this.obstacles = obstacles;
         this.polygons = new ArrayList<>();
         this.path = path;
-
-        System.out.println(path.size());
 
         convertObstaclesToPolygons();
     }
@@ -60,21 +57,7 @@ public class PathViewer extends JPanel {
 
         g.setColor(Color.RED);
 
-        for (Pose p : path) {
-            Vector2i pixelPoint = unitConverter.convertActualPointToPixelPoint(new Vector2f(p.getX(), p.getY()), fieldHeightPixels);
-            g.fillRect(pixelPoint.getX(), pixelPoint.getY(), 20, 20);
-        }
-
         for (int i = 1; i < path.size(); i++) {
-            Random randomGenerator = new Random();
-            int red = randomGenerator.nextInt(256);
-            int green = randomGenerator.nextInt(256);
-            int blue = randomGenerator.nextInt(256);
-
-            Color randomColour = new Color(red,green,blue);
-
-            g.setColor(randomColour);
-
             Vector2i pixelPoint = unitConverter.convertActualPointToPixelPoint(new Vector2f(path.get(i).getX(), path.get(i).getY()), fieldHeightPixels);
             Vector2i prevPixelPoint = unitConverter.convertActualPointToPixelPoint(new Vector2f(path.get(i - 1).getX(), path.get(i - 1).getY()), fieldHeightPixels);
 

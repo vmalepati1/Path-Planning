@@ -28,7 +28,7 @@ public class ConfigurationSpace {
 
     private void calculateSlices() {
         if (angleResolutionDegrees < 0 || angleResolutionDegrees > 360) {
-            throw new IllegalArgumentException("The resolution angle measured in degrees must be greater than 0 and less than 360!");
+            throw new IllegalArgumentException("The angle resolution measured in degrees must be greater than 0 and less than 360!");
         }
 
         slices = new ArrayList<>();
