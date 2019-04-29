@@ -55,13 +55,49 @@ public class PathViewer extends JPanel {
             g.fillPolygon(p);
         }
 
-        g.setColor(Color.RED);
-
         for (int i = 1; i < path.size(); i++) {
             Vector2i pixelPoint = unitConverter.convertActualPointToPixelPoint(new Vector2f(path.get(i).getX(), path.get(i).getY()), fieldHeightPixels);
             Vector2i prevPixelPoint = unitConverter.convertActualPointToPixelPoint(new Vector2f(path.get(i - 1).getX(), path.get(i - 1).getY()), fieldHeightPixels);
 
+            g.setColor(Color.RED);
+            //g.fillOval(prevPixelPoint.getX() - 13, prevPixelPoint.getY() - 13, 26, 26);
+
+            g.setColor(Color.BLUE);
             g.drawLine(pixelPoint.getX(), pixelPoint.getY(), prevPixelPoint.getX(), prevPixelPoint.getY());
+        }
+
+        for (Pose p : path) {
+            List<Vector2f> robotPoints = new ArrayList<>();
+
+            robotPoints.add(new Vector2f(p.getX() - 0.15, p.getY() - 0.15));
+            robotPoints.add(new Vector2f(p.getX() + 0.15, p.getY() - 0.15));
+            robotPoints.add(new Vector2f(p.getX() + 0.15, p.getY() + 0.15));
+            robotPoints.add(new Vector2f(p.getX() - 0.15, p.getY() + 0.15));
+
+            List<Vector2i> pixelPoints = new ArrayList<>();
+
+            for (Vector2f v : robotPoints) {
+                double angleRadians = Math.toRadians(p.getDegrees());
+                double xPrime = Math.cos(angleRadians) * (v.getX() - p.getX()) - Math.sin(angleRadians) * (v.getY() - p.getY()) + p.getX();
+                double yPrime = Math.sin(angleRadians) * (v.getX() - p.getX()) + Math.cos(angleRadians) * (v.getY() - p.getY()) + p.getY();
+
+                System.out.println(xPrime + ", " + yPrime);
+                Vector2i pixelPoint = unitConverter.convertActualPointToPixelPoint(new Vector2f(xPrime, yPrime), fieldHeightPixels);
+                pixelPoints.add(pixelPoint);
+            }
+
+            g.setColor(Color.ORANGE);
+            g.drawLine(pixelPoints.get(0).getX(), pixelPoints.get(0).getY(), pixelPoints.get(pixelPoints.size() - 1).getX(), pixelPoints.get(pixelPoints.size() - 1).getY());
+
+            for (int i = 1; i < pixelPoints.size(); i++) {
+                Vector2i prevPoint = pixelPoints.get(i - 1);
+                Vector2i point = pixelPoints.get(i);
+
+                //System.out.println(point);
+
+                g.setColor(Color.ORANGE);
+                g.drawLine(prevPoint.getX(), prevPoint.getY(), point.getX(), point.getY());
+            }
         }
     }
 

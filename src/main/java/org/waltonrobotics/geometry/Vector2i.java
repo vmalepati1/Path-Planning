@@ -84,7 +84,7 @@ public class Vector2i {
 
     @Override
     public String toString() {
-        return "Vector2i: (" + x + ", " + y + ")";
+        return "Vector2i: (" + getX() + ", " + getY() + ")";
     }
 
     @Override
@@ -93,14 +93,14 @@ public class Vector2i {
         if (object == null) return false;
         if (!(object instanceof Vector2i)) return false;
         Vector2i vec = (Vector2i) object;
-        return vec.getX() == this.getX() && vec.getY() == this.getY();
+        return vec.getX() == getX() && vec.getY() == getY();
     }
 
     @Override
     public int hashCode() {
         long result = 17;
-        result = 31 * result + Double.doubleToLongBits(x);
-        result = 31 * result + Double.doubleToLongBits(y);
+        result = 31 * result + Double.doubleToLongBits(getX());
+        result = 31 * result + Double.doubleToLongBits(getY());
         return (int) result;
     }
 

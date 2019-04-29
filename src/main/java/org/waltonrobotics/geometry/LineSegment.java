@@ -49,7 +49,7 @@ public class LineSegment implements Serializable {
 
     @Override
     public String toString() {
-        return "Line: {" + point1 + " -> " + point2 + "}";
+        return "Line: {" + getPoint1() + " -> " + getPoint2() + "}";
     }
 
     @Override
@@ -58,12 +58,12 @@ public class LineSegment implements Serializable {
         if (object == null) return false;
         if (!(object instanceof LineSegment)) return false;
         LineSegment lineSegment = (LineSegment) object;
-        return lineSegment.getPoint1() == this.getPoint1() && lineSegment.getPoint2() == this.getPoint2();
+        return lineSegment.getPoint1() == getPoint1() && lineSegment.getPoint2() == getPoint2();
     }
 
     @Override
     public int hashCode() {
-        return point1.hashCode() + point2.hashCode();
+        return getPoint1().hashCode() + getPoint2().hashCode();
     }
 
     public Vector2f getIntersectionPoint(LineSegment other) {

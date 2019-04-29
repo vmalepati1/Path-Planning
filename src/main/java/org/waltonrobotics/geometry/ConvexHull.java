@@ -11,6 +11,7 @@ public class ConvexHull implements Serializable {
     private LinkedHashSet<Vector2f> allPoints;
     private List<Vector2f> convexPoints;
     private List<LineSegment> edges;
+    private Rectangle boundingBox;
 
     private static Comparator<Vector2f> rightBottomComparator = (v1, v2) -> {
         int compareX = v1.compareX(v2);
@@ -30,6 +31,7 @@ public class ConvexHull implements Serializable {
         allPoints = new LinkedHashSet<>();
         convexPoints = new ArrayList<>();
         edges = new ArrayList<>();
+        boundingBox = new Rectangle();
     }
 
     /**
@@ -79,8 +81,14 @@ public class ConvexHull implements Serializable {
 
         // Minimum x value within all points
         double minX = sortedPoints.get(bottomLeftIndex).getX();
+        // Minimum y value within all points
+        double minY = sortedPoints.get(bottomLeftIndex).getY();
         // Maximum x value within all points
         double maxX = sortedPoints.get(bottomRightIndex).getX();
+        // Maximum y value within all points
+        double maxY = sortedPoints.get(topRightIndex).getY();
+
+        boundingBox = new Rectangle(minX, maxX, minY, maxY);
 
         // Find our top-left index
         int i = 0;

@@ -106,9 +106,9 @@ public class Pose {
     @Override
     public String toString() {
         return "Pose{" +
-                "x=" + x +
-                ", y=" + y +
-                ", angle=" + angle +
+                "x=" + getX() +
+                ", y=" + getY() +
+                ", angle=" + getAngle() +
                 '}';
     }
 
@@ -118,15 +118,15 @@ public class Pose {
         if (object == null) return false;
         if (!(object instanceof Pose)) return false;
         Pose pose = (Pose) object;
-        return pose.getX() == this.getX() && pose.getY() == this.getY() && pose.getAngle() == this.getAngle();
+        return pose.getX() == getX() && pose.getY() == getY() && pose.getAngle() == getAngle();
     }
 
     @Override
     public int hashCode() {
         long result = 17;
-        result = 31 * result + Double.doubleToLongBits(x);
-        result = 31 * result + Double.doubleToLongBits(y);
-        result = 31 * result + Double.doubleToLongBits(angle);
+        result = 31 * result + Double.doubleToLongBits(getX());
+        result = 31 * result + Double.doubleToLongBits(getY());
+        result = 31 * result + Double.doubleToLongBits(getAngle());
         return (int) result;
     }
 

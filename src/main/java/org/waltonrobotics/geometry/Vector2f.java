@@ -239,7 +239,7 @@ public class Vector2f implements Serializable {
      * @return Distance from this point to other point
      */
     public double distanceTo(Vector2f other) {
-        return Math.sqrt(Math.pow(this.x - other.x, 2) + Math.pow(this.y - other.y, 2));
+        return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));
     }
 
     /**
@@ -311,7 +311,7 @@ public class Vector2f implements Serializable {
 
     @Override
     public String toString() {
-        return "Vector2f: (" + x + ", " + y + ")";
+        return "Vector2f: (" + getX() + ", " + getY() + ")";
     }
 
     @Override
@@ -320,14 +320,14 @@ public class Vector2f implements Serializable {
         if (object == null) return false;
         if (!(object instanceof Vector2f)) return false;
         Vector2f vec = (Vector2f) object;
-        return vec.getX() == this.getX() && vec.getY() == this.getY();
+        return vec.getX() == getX() && vec.getY() == getY();
     }
 
     @Override
     public int hashCode() {
         long result = 17;
-        result = 31 * result + Double.doubleToLongBits(x);
-        result = 31 * result + Double.doubleToLongBits(y);
+        result = 31 * result + Double.doubleToLongBits(getX());
+        result = 31 * result + Double.doubleToLongBits(getY());
         return (int) result;
     }
 
@@ -355,7 +355,7 @@ public class Vector2f implements Serializable {
      * @return -1 if this.x < other.x, 0 if this.x == other.x, 1 if this.x > other.x
      */
     public int compareX(Vector2f other) {
-        return compareValues(this.x, other.getX());
+        return compareValues(x, other.getX());
     }
 
     /**
@@ -365,7 +365,7 @@ public class Vector2f implements Serializable {
      * @return -1 if this.y < other.y, 0 if this.y == other.y, 1 if this.y > other.y
      */
     public int compareY(Vector2f other) {
-        return compareValues(this.y, other.getY());
+        return compareValues(y, other.getY());
     }
 
 }

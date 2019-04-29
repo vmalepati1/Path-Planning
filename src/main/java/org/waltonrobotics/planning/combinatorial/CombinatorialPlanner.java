@@ -198,12 +198,14 @@ public class CombinatorialPlanner implements PathPlanner {
 
         CombinatorialPlanner planner = new CombinatorialPlanner(robot, field.getObstacles(), 45, 1);
 
-        List<Pose> path = planner.findPath(new Pose(7.614804292929293, 6.618474759274993, 90), new Pose(15, 3, 90));
+        List<Pose> path = planner.findPath(new Pose(7.614804292929293, 6.618474759274993, 90), new Pose(15, 7, 45));
+
+        System.out.println(path);
 
         JFrame fieldGUIFrame = new JFrame();
 
         fieldGUIFrame.setResizable(false);
-        fieldGUIFrame.setTitle("Generated Field");
+        fieldGUIFrame.setTitle("Combinatorial Planning Result");
         fieldGUIFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         //fieldGUIFrame.add(new FieldViewer(field.getFieldWidthPixels(), field.getFieldHeightPixels(), field.getUnitConverter(), field.getObstacles()));
