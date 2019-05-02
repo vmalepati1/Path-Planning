@@ -13,8 +13,12 @@ public class Rectangle {
         setBounds(minX, maxX, minY, maxY);
     }
 
+    public Rectangle(Rectangle rectangle) {
+        setBounds(rectangle.minX, rectangle.maxX, rectangle.minY, rectangle.maxY);
+    }
+
     public Rectangle() {
-        setDefaultBounds();
+        setToNull();
     }
 
     public double getMinX() {
@@ -45,44 +49,54 @@ public class Rectangle {
             this.maxY = maxY;
         }
         else {
-            setDefaultBounds();
+            setToNull();
         }
 
         calculateCenterPoint();
     }
 
-    public void setDefaultBounds() {
+    public void setToNull() {
         this.minX = 0;
-        this.maxX = 1;
+        this.maxX = -1;
         this.minY = 0;
-        this.maxY = 1;
+        this.maxY = -1;
+    }
 
-        calculateCenterPoint();
+    public boolean isNull() {
+        return maxX < minX;
     }
 
     public void calculateCenterPoint() {
+        if (isNull()) return;
         centerPoint = new Vector2f((minX + maxX) / 2, (minY + maxY) / 2);
     }
 
     public void expandToInclude(Rectangle other) {
-        if (other.minX < minX) {
-            minX = other.minX;
-        }
+        if (other.isNull()) return;
 
-        if (other.maxX > maxX) {
-            maxX = other.maxX;
-        }
+        if (isNull()) {
+            setBounds(other.minX, other.maxX, other.minY, other.maxY);
+        } else {
+            if (other.minX < minX) {
+                minX = other.minX;
+            }
 
-        if (other.minY < minY) {
-            minY = other.minY;
-        }
+            if (other.maxX > maxX) {
+                maxX = other.maxX;
+            }
 
-        if (other.maxY > maxY) {
-            maxY = other.maxY;
+            if (other.minY < minY) {
+                minY = other.minY;
+            }
+
+            if (other.maxY > maxY) {
+                maxY = other.maxY;
+            }
         }
     }
 
     public boolean intersects(Rectangle other) {
+        if (isNull() || other.isNull()) return false;
         return other.minX <= maxX && other.maxX >= minX && other.minY <= other.maxY && other.maxY >= other.minY;
     }
 

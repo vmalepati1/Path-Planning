@@ -2,10 +2,7 @@ package org.waltonrobotics.tree;
 
 import org.waltonrobotics.geometry.Rectangle;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class STRTree {
 
@@ -58,82 +55,64 @@ public class STRTree {
         int leafLevelPages = (int)Math.ceil(boundingBoxes.size() / (double)leafCapacity);
         int numberOfVerticleSlices = (int)Math.ceil(Math.sqrt(leafLevelPages));
         int sliceCapacity = numberOfVerticleSlices * leafCapacity;
-        int sliceLeftover = boundingBoxes.size() % sliceCapacity;
-        int sliceLastIndex = sliceLeftover + (int)Math.floor(boundingBoxes.size() / (double)sliceCapacity) * sliceCapacity - 1;
-
-        System.out.println(sliceLastIndex);
+        int numberOfTilesPerSlice = (int)Math.ceil(sliceCapacity / (double)leafCapacity);
 
         Rectangle allEncompassing = new Rectangle();
-        Rectangle currentSliceEncompassing = new Rectangle();
-
-        List<Rectangle> currentSliceBoundingBoxes = new ArrayList<>();
-
-        int boundingBoxesAddedToSlice = 0;
 
         addRoot(allEncompassing);
 
-        System.out.println(boundingBoxes.size());
-        System.out.println(sliceCapacity);
-
         boundingBoxes.sort(xComparator);
 
-        for (int i = 0; i < boundingBoxes.size(); i++) {
-            Rectangle bb = boundingBoxes.get(i);
+        Iterator i = boundingBoxes.iterator();
 
-            allEncompassing.expandToInclude(bb);
+        for (int j = 0; j < numberOfVerticleSlices; j++) {
+            Rectangle currentSliceEncompassing = new Rectangle();
+            List<Rectangle> currentSliceBoundingBoxes = new ArrayList<>();
 
-            currentSliceEncompassing.expandToInclude(bb);
-            currentSliceBoundingBoxes.add(bb);
-            boundingBoxesAddedToSlice++;
+            int boundingBoxesAddedToSlice = 0;
 
-            if (boundingBoxesAddedToSlice >= sliceCapacity || i == sliceLastIndex) {
+            while (i.hasNext() && boundingBoxesAddedToSlice < sliceCapacity) {
+                Rectangle sliceBoundingBox = (Rectangle) i.next();
+
+                allEncompassing.expandToInclude(sliceBoundingBox);
+
+                currentSliceEncompassing.expandToInclude(sliceBoundingBox);
+                currentSliceBoundingBoxes.add(sliceBoundingBox);
+                boundingBoxesAddedToSlice++;
+            }
+
+            STRTreeNode sliceNode = addNode(root, currentSliceEncompassing);
+
+            currentSliceBoundingBoxes.sort(yComparator);
+
+            Iterator k = currentSliceBoundingBoxes.iterator();
+
+            for (int l = 0; l < numberOfTilesPerSlice; l++) {
                 Rectangle currentTileEncompassing = new Rectangle();
-
                 List<Rectangle> currentTileBoundingBoxes = new ArrayList<>();
 
                 int boundingBoxesAddedToTile = 0;
 
-                STRTreeNode sliceNode = addNode(root, currentSliceEncompassing);
-
-                currentSliceBoundingBoxes.sort(yComparator);
-
-                for (Rectangle currentSliceBoundingBox : currentSliceBoundingBoxes) {
-                    currentTileEncompassing.expandToInclude(currentSliceBoundingBox);
-                    currentTileBoundingBoxes.add(currentSliceBoundingBox);
+                while (k.hasNext() && boundingBoxesAddedToTile < leafCapacity) {
+                    Rectangle tileBoundingBox = (Rectangle) k.next();
+                    currentTileEncompassing.expandToInclude(tileBoundingBox);
+                    currentTileBoundingBoxes.add(tileBoundingBox);
                     boundingBoxesAddedToTile++;
-
-                    if (boundingBoxesAddedToTile >= leafCapacity) {
-                        STRTreeNode tileNode = addNode(sliceNode, currentTileEncompassing);
-
-                        for (Rectangle tileBB : currentTileBoundingBoxes) {
-                            addNode(tileNode, tileBB);
-                        }
-
-                        currentTileEncompassing = new Rectangle();
-                        currentTileBoundingBoxes.clear();
-                        boundingBoxesAddedToTile = 0;
-                    }
                 }
 
-                currentSliceEncompassing = new Rectangle();
-                currentSliceBoundingBoxes.clear();
-                boundingBoxesAddedToSlice = 0;
+                STRTreeNode tileNode = addNode(sliceNode, currentTileEncompassing);
+
+                for (Rectangle tileBB : currentTileBoundingBoxes) {
+                    addNode(tileNode, tileBB);
+                }
             }
-        }
-    }
-
-    public static void printTree(STRTreeNode node) {
-        System.out.println(node.boundingBox);
-
-        for (STRTreeNode child : node.children) {
-            printTree(child);
         }
     }
 
     public static void main(String[] args) {
         List<Rectangle> boundingBoxes = new ArrayList<>();
 
-        boundingBoxes.add(new Rectangle());
+        boundingBoxes.add(new Rectangle(0, 1, 0, 1));
         boundingBoxes.add(new Rectangle(-2, 2, -2, 2));
         boundingBoxes.add(new Rectangle(4, 5, 4, 5));
         boundingBoxes.add(new Rectangle(6, 7, 6, 7));
@@ -143,7 +122,19 @@ public class STRTree {
 
         STRTree strTree = new STRTree(2, boundingBoxes);
 
-        printTree(strTree.getRoot());
+        System.out.println(strTree.getRoot().boundingBox);
+
+        for (STRTreeNode s : strTree.getRoot().children) {
+            System.out.println("--> " + s.boundingBox);
+
+            for (STRTreeNode t : s.children) {
+                System.out.println("----> " + t.boundingBox);
+
+                for (STRTreeNode b : t.children) {
+                    System.out.println("------>" + b.boundingBox);
+                }
+            }
+        }
     }
 
 }
