@@ -1,22 +1,65 @@
 package org.waltonrobotics.tree;
 
+import org.waltonrobotics.geometry.ConvexHull;
 import org.waltonrobotics.geometry.Rectangle;
+import org.waltonrobotics.geometry.Vector2f;
 
 import java.util.*;
 
 public class STRTree {
 
+    private static Comparator<Rectangle> xComparator = (r1, r2) -> r1.getCenterPoint().compareX(r2.getCenterPoint());
+    private static Comparator<Rectangle> yComparator = (r1, r2) -> r1.getCenterPoint().compareY(r2.getCenterPoint());
     private int leafCapacity;
     private List<Rectangle> boundingBoxes;
     private STRTreeNode root;
-
-    private static Comparator<Rectangle> xComparator = (r1, r2) -> r1.getCenterPoint().compareX(r2.getCenterPoint());
-    private static Comparator<Rectangle> yComparator = (r1, r2) -> r1.getCenterPoint().compareY(r2.getCenterPoint());
 
     public STRTree(int leafCapacity, List<Rectangle> boundingBoxes) {
         this.leafCapacity = leafCapacity;
         this.boundingBoxes = boundingBoxes;
         calculateTree();
+    }
+
+    public static void main(String[] args) {
+        ConvexHull a = new ConvexHull();
+        a.begin();
+        a.addPoint(new Vector2f(0, 0));
+        a.addPoint(new Vector2f(5, 0));
+        a.addPoint(new Vector2f(5, 1));
+        a.addPoint(new Vector2f(2, 1));
+        a.addPoint(new Vector2f(3, 2));
+        a.addPoint(new Vector2f(0, 2));
+        a.addPoint(new Vector2f(2, 0));
+        a.addPoint(new Vector2f(3, 0));
+        a.end();
+
+        System.out.println(a.getConvexPoints());
+
+        List<Rectangle> boundingBoxes = new ArrayList<>();
+
+        boundingBoxes.add(new Rectangle(0, 1, 0, 1));
+        boundingBoxes.add(new Rectangle(-2, 2, -2, 2));
+        boundingBoxes.add(new Rectangle(4, 5, 4, 5));
+        boundingBoxes.add(new Rectangle(6, 7, 6, 7));
+        boundingBoxes.add(new Rectangle(8, 9, 8, 9));
+        boundingBoxes.add(new Rectangle(10, 11, 10, 11));
+        boundingBoxes.add(new Rectangle(12, 13, 12, 13));
+
+        STRTree strTree = new STRTree(2, boundingBoxes);
+
+        System.out.println(strTree.getRoot().boundingBox);
+
+        for (STRTreeNode s : strTree.getRoot().children) {
+            System.out.println("--> " + s.boundingBox);
+
+            for (STRTreeNode t : s.children) {
+                System.out.println("----> " + t.boundingBox);
+
+                for (STRTreeNode b : t.children) {
+                    System.out.println("------>" + b.boundingBox);
+                }
+            }
+        }
     }
 
     public int getLeafCapacity() {
@@ -52,10 +95,10 @@ public class STRTree {
     }
 
     private void calculateTree() {
-        int leafLevelPages = (int)Math.ceil(boundingBoxes.size() / (double)leafCapacity);
-        int numberOfVerticleSlices = (int)Math.ceil(Math.sqrt(leafLevelPages));
+        int leafLevelPages = (int) Math.ceil(boundingBoxes.size() / (double) leafCapacity);
+        int numberOfVerticleSlices = (int) Math.ceil(Math.sqrt(leafLevelPages));
         int sliceCapacity = numberOfVerticleSlices * leafCapacity;
-        int numberOfTilesPerSlice = (int)Math.ceil(sliceCapacity / (double)leafCapacity);
+        int numberOfTilesPerSlice = (int) Math.ceil(sliceCapacity / (double) leafCapacity);
 
         Rectangle allEncompassing = new Rectangle();
 
@@ -104,34 +147,6 @@ public class STRTree {
 
                 for (Rectangle tileBB : currentTileBoundingBoxes) {
                     addNode(tileNode, tileBB);
-                }
-            }
-        }
-    }
-
-    public static void main(String[] args) {
-        List<Rectangle> boundingBoxes = new ArrayList<>();
-
-        boundingBoxes.add(new Rectangle(0, 1, 0, 1));
-        boundingBoxes.add(new Rectangle(-2, 2, -2, 2));
-        boundingBoxes.add(new Rectangle(4, 5, 4, 5));
-        boundingBoxes.add(new Rectangle(6, 7, 6, 7));
-        boundingBoxes.add(new Rectangle(8, 9, 8, 9));
-        boundingBoxes.add(new Rectangle(10, 11, 10, 11));
-        boundingBoxes.add(new Rectangle(12, 13, 12, 13));
-
-        STRTree strTree = new STRTree(2, boundingBoxes);
-
-        System.out.println(strTree.getRoot().boundingBox);
-
-        for (STRTreeNode s : strTree.getRoot().children) {
-            System.out.println("--> " + s.boundingBox);
-
-            for (STRTreeNode t : s.children) {
-                System.out.println("----> " + t.boundingBox);
-
-                for (STRTreeNode b : t.children) {
-                    System.out.println("------>" + b.boundingBox);
                 }
             }
         }

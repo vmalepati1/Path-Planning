@@ -9,37 +9,105 @@ import java.util.*;
 
 public class VisibilityGraph {
 
-    private static class CCWHalfLineComparator implements Comparator<Vector2f> {
+    private List<Vector2f> vertices;
+    private List<LineSegment> edges;
+    private List<ConvexHull> obstacles;
+    private double robotOrientationDegrees;
+    private Map<Pose, List<Pose>> graphAdjacencyList;
 
-        private Vector2f halfLineOrigin;
+    public VisibilityGraph(List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles, double robotOrientationDegrees) {
+        this.vertices = vertices;
+        this.edges = edges;
+        this.obstacles = obstacles;
+        this.robotOrientationDegrees = robotOrientationDegrees;
 
-        private CCWHalfLineComparator(Vector2f halfLineOrigin) {
-            this.halfLineOrigin = halfLineOrigin;
+        calculateVisibilityGraph();
+    }
+
+    public static boolean edgeIntersect(Vector2f p1, Vector2f q1, LineSegment edge) {
+        Vector2f p2 = edge.getPoint1();
+        Vector2f q2 = edge.getPoint2();
+
+        int o1 = isCCW(p1, q1, p2);
+        int o2 = isCCW(p1, q1, q2);
+        int o3 = isCCW(p2, q2, p1);
+        int o4 = isCCW(p2, q2, q1);
+
+        if (o1 != o2 && o3 != o4) {
+            return true;
         }
 
-        @Override
-        public int compare(Vector2f v1, Vector2f v2) {
-            double v1CCWAngle = halfLineOrigin.angleTo(v1);
-            double v2CCWAngle = halfLineOrigin.angleTo(v2);
+        if (o1 == 0 && onSegment(p1, p2, q1)) {
+            return true;
+        }
 
-            if (v1CCWAngle > v2CCWAngle) {
-                return 1;
-            } else if (v1CCWAngle < v2CCWAngle) {
-                return -1;
-            } else {
-                double halfLineOriginToV1 = halfLineOrigin.distanceTo(v1);
-                double halfLineOriginToV2 = halfLineOrigin.distanceTo(v2);
+        if (o2 == 0 && onSegment(p1, q2, q1)) {
+            return true;
+        }
 
-                if (halfLineOriginToV1 > halfLineOriginToV2) {
-                    return 1;
-                } else if (halfLineOriginToV1 < halfLineOriginToV2) {
-                    return -1;
+        if (o3 == 0 && onSegment(p2, p1, q2)) {
+            return true;
+        }
+
+        return o4 == 0 && onSegment(p2, q1, q2);
+    }
+
+    private static boolean edgeInPolygon(Vector2f p1, Vector2f p2, List<ConvexHull> obstacles) {
+        if (p1.getPolygonID() != p2.getPolygonID()) {
+            return false;
+        }
+
+        if (p1.getPolygonID() == -1 || p2.getPolygonID() == -1) {
+            return false;
+        }
+
+        Vector2f midPoint = new Vector2f((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
+
+        return polygonCrossing(midPoint, obstacles.get(p1.getPolygonID()));
+    }
+
+    private static boolean polygonCrossing(Vector2f midPoint, ConvexHull convexHull) {
+        Vector2f p2 = new Vector2f(Double.POSITIVE_INFINITY, midPoint.getY());
+
+        int intersectCount = 0;
+
+        for (LineSegment e : convexHull.getEdges()) {
+            if (midPoint.getY() < e.getPoint1().getY() && midPoint.getY() < e.getPoint2().getY()) continue;
+            if (midPoint.getY() > e.getPoint1().getY() && midPoint.getY() > e.getPoint2().getY()) continue;
+            if (midPoint.getX() > e.getPoint1().getX() && midPoint.getX() > e.getPoint2().getX()) continue;
+
+            boolean edgeP1Collinear = (isCCW(midPoint, e.getPoint1(), p2) == 0);
+            boolean edgeP2Collinear = (isCCW(midPoint, e.getPoint2(), p2) == 0);
+
+            if (edgeP1Collinear && edgeP2Collinear) continue;
+            if (edgeP1Collinear || edgeP2Collinear) {
+                Vector2f collinearPoint = edgeP1Collinear ? e.getPoint1() : e.getPoint2();
+
+                if (e.getAdjacent(collinearPoint).getY() > midPoint.getY()) {
+                    intersectCount++;
                 }
+            } else if (edgeIntersect(midPoint, p2, e)) {
+                intersectCount++;
             }
-
-            return 0;
         }
 
+        return intersectCount % 2 != 0;
+    }
+
+    private static int isCCW(Vector2f a, Vector2f b, Vector2f c) {
+        double area = ((b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX()));
+
+        if (area > 0) return 1;
+        if (area < 0) return -1;
+        return 0;
+    }
+
+    private static boolean onSegment(Vector2f p, Vector2f q, Vector2f r) {
+        if (q.getX() <= Math.max(p.getX(), r.getX()) && (q.getX() >= Math.min(p.getX(), r.getX()))) {
+            return q.getY() <= Math.max(p.getY(), r.getY()) && (q.getY() >= Math.min(p.getY(), r.getY()));
+        }
+
+        return false;
     }
 
     public List<Vector2f> getVertices() {
@@ -60,21 +128,6 @@ public class VisibilityGraph {
 
     public Map<Pose, List<Pose>> getGraphAdjacencyList() {
         return graphAdjacencyList;
-    }
-
-    private List<Vector2f> vertices;
-    private List<LineSegment> edges;
-    private List<ConvexHull> obstacles;
-    private double robotOrientationDegrees;
-    private Map<Pose, List<Pose>> graphAdjacencyList;
-
-    public VisibilityGraph(List<Vector2f> vertices, List<LineSegment> edges, List<ConvexHull> obstacles, double robotOrientationDegrees) {
-        this.vertices = vertices;
-        this.edges = edges;
-        this.obstacles = obstacles;
-        this.robotOrientationDegrees = robotOrientationDegrees;
-
-        calculateVisibilityGraph();
     }
 
     private void calculateVisibilityGraph() {
@@ -201,90 +254,37 @@ public class VisibilityGraph {
         return visibleVertices;
     }
 
-    public static boolean edgeIntersect(Vector2f p1, Vector2f q1, LineSegment edge) {
-        Vector2f p2 = edge.getPoint1();
-        Vector2f q2 = edge.getPoint2();
+    private static class CCWHalfLineComparator implements Comparator<Vector2f> {
 
-        int o1 = isCCW(p1, q1, p2);
-        int o2 = isCCW(p1, q1, q2);
-        int o3 = isCCW(p2, q2, p1);
-        int o4 = isCCW(p2, q2, q1);
+        private Vector2f halfLineOrigin;
 
-        if (o1 != o2 && o3 != o4) {
-            return true;
+        private CCWHalfLineComparator(Vector2f halfLineOrigin) {
+            this.halfLineOrigin = halfLineOrigin;
         }
 
-        if (o1 == 0 && onSegment(p1, p2, q1)) {
-            return true;
-        }
+        @Override
+        public int compare(Vector2f v1, Vector2f v2) {
+            double v1CCWAngle = halfLineOrigin.angleTo(v1);
+            double v2CCWAngle = halfLineOrigin.angleTo(v2);
 
-        if (o2 == 0 && onSegment(p1, q2, q1)) {
-            return true;
-        }
+            if (v1CCWAngle > v2CCWAngle) {
+                return 1;
+            } else if (v1CCWAngle < v2CCWAngle) {
+                return -1;
+            } else {
+                double halfLineOriginToV1 = halfLineOrigin.distanceTo(v1);
+                double halfLineOriginToV2 = halfLineOrigin.distanceTo(v2);
 
-        if (o3 == 0 && onSegment(p2, p1, q2)) {
-            return true;
-        }
-
-        return o4 == 0 && onSegment(p2, q1, q2);
-    }
-
-    private static boolean edgeInPolygon(Vector2f p1, Vector2f p2, List<ConvexHull> obstacles) {
-        if (p1.getPolygonID() != p2.getPolygonID()) {
-            return false;
-        }
-        
-        if (p1.getPolygonID() == -1 || p2.getPolygonID() == -1) {
-            return false;
-        }
-        
-        Vector2f midPoint = new Vector2f((p1.getX() + p2.getX()) / 2, (p1.getY() + p2.getY()) / 2);
-        
-        return polygonCrossing(midPoint, obstacles.get(p1.getPolygonID()));
-    }
-
-    private static boolean polygonCrossing(Vector2f midPoint, ConvexHull convexHull) {
-        Vector2f p2 = new Vector2f(Double.POSITIVE_INFINITY, midPoint.getY());
-
-        int intersectCount = 0;
-
-        for (LineSegment e : convexHull.getEdges()) {
-            if (midPoint.getY() < e.getPoint1().getY() && midPoint.getY() < e.getPoint2().getY()) continue;
-            if (midPoint.getY() > e.getPoint1().getY() && midPoint.getY() > e.getPoint2().getY()) continue;
-            if (midPoint.getX() > e.getPoint1().getX() && midPoint.getX() > e.getPoint2().getX()) continue;
-
-            boolean edgeP1Collinear = (isCCW(midPoint, e.getPoint1(), p2) == 0);
-            boolean edgeP2Collinear = (isCCW(midPoint, e.getPoint2(), p2) == 0);
-
-            if (edgeP1Collinear && edgeP2Collinear) continue;
-            if (edgeP1Collinear || edgeP2Collinear) {
-                Vector2f collinearPoint = edgeP1Collinear ? e.getPoint1() : e.getPoint2();
-
-                if (e.getAdjacent(collinearPoint).getY() > midPoint.getY()) {
-                    intersectCount++;
+                if (halfLineOriginToV1 > halfLineOriginToV2) {
+                    return 1;
+                } else if (halfLineOriginToV1 < halfLineOriginToV2) {
+                    return -1;
                 }
-            } else if (edgeIntersect(midPoint, p2, e)) {
-                intersectCount++;
             }
+
+            return 0;
         }
 
-        return intersectCount % 2 != 0;
-    }
-
-    private static int isCCW(Vector2f a, Vector2f b, Vector2f c) {
-        double area = ((b.getX() - a.getX()) * (c.getY() - a.getY()) - (b.getY() - a.getY()) * (c.getX() - a.getX()));
-
-        if (area > 0) return 1;
-        if (area < 0) return -1;
-        return 0;
-    }
-
-    private static boolean onSegment(Vector2f p, Vector2f q, Vector2f r) {
-        if (q.getX() <= Math.max(p.getX(), r.getX()) && (q.getX() >= Math.min(p.getX(), r.getX()))) {
-            return q.getY() <= Math.max(p.getY(), r.getY()) && (q.getY() >= Math.min(p.getY(), r.getY()));
-        }
-
-        return false;
     }
 
 }

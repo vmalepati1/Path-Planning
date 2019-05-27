@@ -7,8 +7,8 @@ public class Pose {
     private final double angle;
 
     /**
-     * @param x the x coordinate in space
-     * @param y the y coordinate in space
+     * @param x     the x coordinate in space
+     * @param y     the y coordinate in space
      * @param angle the angle in degrees
      */
     public Pose(double x, double y, double angle) {
@@ -68,8 +68,8 @@ public class Pose {
      * Rotates a point around a central point. Imagine making an arc on a circle
      *
      * @param centerPoint the center of the circle
-     * @param arcAngle the angle to rotate the point to (degrees)
-     * @param backwards whether or not to rotate the point backwards (clockwise)
+     * @param arcAngle    the angle to rotate the point to (degrees)
+     * @param backwards   whether or not to rotate the point backwards (clockwise)
      * @return the rotated point
      */
     public final Pose rotate(Pose centerPoint, double arcAngle, boolean backwards, double scale) {

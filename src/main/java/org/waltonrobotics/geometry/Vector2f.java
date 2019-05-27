@@ -10,14 +10,6 @@ public class Vector2f implements Serializable {
     private double x, y;
     private int polygonID;
 
-    public int getPolygonID() {
-        return polygonID;
-    }
-
-    public void setPolygonID(int polygonID) {
-        this.polygonID = polygonID;
-    }
-
     /**
      * Creates a new zero vector.
      */
@@ -75,6 +67,14 @@ public class Vector2f implements Serializable {
     public Vector2f(double scalar) {
         this.x = scalar;
         this.y = scalar;
+    }
+
+    public int getPolygonID() {
+        return polygonID;
+    }
+
+    public void setPolygonID(int polygonID) {
+        this.polygonID = polygonID;
     }
 
     /**
@@ -235,6 +235,7 @@ public class Vector2f implements Serializable {
 
     /**
      * Finds distance between this point and another point
+     *
      * @param other: Other point
      * @return Distance from this point to other point
      */

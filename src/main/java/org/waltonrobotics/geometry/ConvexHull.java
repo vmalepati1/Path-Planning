@@ -8,11 +8,6 @@ import java.util.*;
  */
 public class ConvexHull implements Serializable {
 
-    private LinkedHashSet<Vector2f> allPoints;
-    private List<Vector2f> convexPoints;
-    private List<LineSegment> edges;
-    private Rectangle boundingBox;
-
     private static Comparator<Vector2f> rightBottomComparator = (v1, v2) -> {
         int compareX = v1.compareX(v2);
         int compareY = v1.compareY(v2);
@@ -23,6 +18,10 @@ public class ConvexHull implements Serializable {
 
         return compareX;
     };
+    private LinkedHashSet<Vector2f> allPoints;
+    private List<Vector2f> convexPoints;
+    private List<LineSegment> edges;
+    private Rectangle boundingBox;
 
     /**
      * Constructs a new convex hull.

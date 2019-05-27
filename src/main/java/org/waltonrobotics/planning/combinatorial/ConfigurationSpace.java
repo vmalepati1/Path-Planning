@@ -26,6 +26,27 @@ public class ConfigurationSpace {
         calculateSlices();
     }
 
+    public static void main(String[] args) {
+        Field field = null;
+
+        try {
+            field = new Field("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        ConvexHull robot = new ConvexHull();
+
+        robot.begin();
+        robot.addPoint(new Vector2f(0.0, 0.0));
+        robot.addPoint(new Vector2f(1.0, 0.0));
+        robot.addPoint(new Vector2f(1.0, 1.0));
+        robot.addPoint(new Vector2f(0.0, 1.0));
+        robot.end();
+
+        ConfigurationSpace cSpace = new ConfigurationSpace(robot, field.getObstacles(), 5.0);
+    }
+
     private void calculateSlices() {
         if (angleResolutionDegrees < 0 || angleResolutionDegrees > 360) {
             throw new IllegalArgumentException("The angle resolution measured in degrees must be greater than 0 and less than 360!");
@@ -95,27 +116,6 @@ public class ConfigurationSpace {
 
     public List<VisibilityGraph> getSlices() {
         return slices;
-    }
-
-    public static void main(String[] args) {
-        Field field = null;
-
-        try {
-            field = new Field("C:\\Users\\User\\Documents\\GitHub\\Path-Planning\\res\\fields\\DeepSpaceField.field");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        ConvexHull robot = new ConvexHull();
-
-        robot.begin();
-        robot.addPoint(new Vector2f(0.0, 0.0));
-        robot.addPoint(new Vector2f(1.0, 0.0));
-        robot.addPoint(new Vector2f(1.0, 1.0));
-        robot.addPoint(new Vector2f(0.0, 1.0));
-        robot.end();
-
-        ConfigurationSpace cSpace = new ConfigurationSpace(robot, field.getObstacles(),5.0);
     }
 
 }

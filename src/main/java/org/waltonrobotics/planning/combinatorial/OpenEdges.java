@@ -8,14 +8,14 @@ import java.util.List;
 
 public class OpenEdges {
 
-    public List<LineSegment> getOpenEdges() {
-        return openEdges;
-    }
-
     private List<LineSegment> openEdges;
 
     public OpenEdges() {
         openEdges = new ArrayList<>();
+    }
+
+    public List<LineSegment> getOpenEdges() {
+        return openEdges;
     }
 
     public void insert(Vector2f halfLineOrigin, Vector2f w, LineSegment edge) {
@@ -45,7 +45,7 @@ public class OpenEdges {
 
             if (lessThan(halfLineOrigin, w, edge, openEdges.get(mid))) {
                 high = mid;
-            } else{
+            } else {
                 low = mid + 1;
             }
         }

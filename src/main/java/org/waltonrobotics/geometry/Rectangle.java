@@ -47,8 +47,7 @@ public class Rectangle {
             this.maxX = maxX;
             this.minY = minY;
             this.maxY = maxY;
-        }
-        else {
+        } else {
             setToNull();
         }
 
